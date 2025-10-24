@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using Reloaded.Hooks.ReloadedII.Interfaces;
 using Reloaded.Mod.Interfaces;
@@ -43,6 +45,11 @@ public partial class Mod : ModBase // <= Do not Remove.
     /// </summary>
     private readonly IModConfig _modConfig;
 
+    /// <summary>
+    /// Responsible for generating BPModLoader configuration data.
+    /// </summary>
+    private readonly BlueprintManager _blueprintManager;
+
     [LibraryImport("UE4SS.dll", EntryPoint = "setup_mod")]
     private static partial void SetupMod([MarshalAs(UnmanagedType.LPWStr)] string str);
     
@@ -54,8 +61,12 @@ public partial class Mod : ModBase // <= Do not Remove.
         _owner = context.Owner;
         _configuration = context.Configuration;
         _modConfig = context.ModConfig;
-        
+
+        _blueprintManager = new BlueprintManager(_modLoader, _modConfig, _logger);
+
         var dll = NativeLibrary.Load(_modLoader.GetDirectoryForModId(context.ModConfig.ModId) + @"\UE4SS.dll");
+
+        _blueprintManager.RefreshConfig();
 
         // For more information about this template, please see
         // https://reloaded-project.github.io/Reloaded-II/ModTemplate/
@@ -64,13 +75,24 @@ public partial class Mod : ModBase // <= Do not Remove.
         // TODO: Implement some mod logic
         _modLoader.ModLoading += (v1, configV1) =>
         {
-            if (!Directory.Exists(_modLoader.GetDirectoryForModId(configV1.ModId) + @"\UE4SS")) return;
-            SetupMod(_modLoader.GetDirectoryForModId(configV1.ModId) + @"\UE4SS");
+            var modDirectory = _modLoader.GetDirectoryForModId(configV1.ModId);
+            var ue4SsDirectory = Path.Combine(modDirectory, "UE4SS");
+            if (Directory.Exists(ue4SsDirectory))
+            {
+                SetupMod(ue4SsDirectory);
+            }
+
+            _blueprintManager.RefreshConfig();
         };
 
         _modLoader.ModUnloading += (v1, configV1) =>
         {
-            NativeLibrary.Free(dll);
+            if (configV1.ModId.Equals(_modConfig.ModId, StringComparison.OrdinalIgnoreCase))
+            {
+                NativeLibrary.Free(dll);
+            }
+
+            _blueprintManager.RefreshConfig();
         };
     }
 
