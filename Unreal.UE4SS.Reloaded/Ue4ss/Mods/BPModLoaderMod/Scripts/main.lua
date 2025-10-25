@@ -159,7 +159,6 @@ local function LoadModConfigs()
         end
     end
 
-    -- 3) Keep your existing load order logic (load_order.txt still honored)
     LoadModOrder()
     SetupModOrder()
 end
