@@ -50,9 +50,19 @@ public partial class Mod : ModBase // <= Do not Remove.
     /// </summary>
     private readonly BlueprintManager _blueprintManager;
 
+    /// <summary>
+    /// Mirrors UE4SS log output into the Reloaded-II console.
+    /// </summary>
+    private readonly LogPrinter _logPrinter;
+
+    /// <summary>
+    /// Writes UE4SS configuration settings to disk.
+    /// </summary>
+    private readonly UE4SSSettings _settings;
+
     [LibraryImport("UE4SS.dll", EntryPoint = "setup_mod")]
     private static partial void SetupMod([MarshalAs(UnmanagedType.LPWStr)] string str);
-    
+
     public Mod(ModContext context)
     {
         _modLoader = context.ModLoader;
@@ -64,15 +74,19 @@ public partial class Mod : ModBase // <= Do not Remove.
 
         _blueprintManager = new BlueprintManager(_modLoader, _modConfig, _logger);
 
-        var dll = NativeLibrary.Load(_modLoader.GetDirectoryForModId(context.ModConfig.ModId) + @"\UE4SS.dll");
+        var modDirectory = _modLoader.GetDirectoryForModId(context.ModConfig.ModId);
+
+        _settings = new UE4SSSettings(_modLoader, _modConfig, _logger);
+        _settings.Write(_configuration);
+        var ue4ssDllPath = Path.Combine(modDirectory, "UE4SS.dll");
+        var dll = NativeLibrary.Load(ue4ssDllPath);
+
+        _logPrinter = new LogPrinter(_logger, Path.GetDirectoryName(ue4ssDllPath) ?? modDirectory, _modConfig.ModId);
+        _logPrinter.SetEnabled(_configuration.EnableLogPrinter);
 
         _blueprintManager.RefreshConfig();
 
-        // For more information about this template, please see
-        // https://reloaded-project.github.io/Reloaded-II/ModTemplate/
-        // If you want to implement e.g. unload support in your mod,
-        // and some other neat features, override the methods in ModBase.
-        // TODO: Implement some mod logic
+
         _modLoader.ModLoading += (v1, configV1) =>
         {
             var modDirectory = _modLoader.GetDirectoryForModId(configV1.ModId);
@@ -90,6 +104,7 @@ public partial class Mod : ModBase // <= Do not Remove.
             if (configV1.ModId.Equals(_modConfig.ModId, StringComparison.OrdinalIgnoreCase))
             {
                 NativeLibrary.Free(dll);
+                _logPrinter.Dispose();
             }
 
             _blueprintManager.RefreshConfig();
@@ -103,6 +118,8 @@ public partial class Mod : ModBase // <= Do not Remove.
         // ... your code here.
         _configuration = configuration;
         _logger.WriteLine($"[{_modConfig.ModId}] Config Updated: Applying");
+        _logPrinter.SetEnabled(_configuration.EnableLogPrinter);
+        _settings.Write(_configuration);
     }
     #endregion
 
