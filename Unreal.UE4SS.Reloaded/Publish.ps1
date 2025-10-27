@@ -162,7 +162,7 @@ param (
     $UseScriptDirectory=$True,
 
     ## => User Config <= ## 
-    $ProjectPath = "Unreal.UE4SS.Reloaded.csproj",
+    $ProjectPath = "Unreal.UE4SS.Reloaded/Unreal.UE4SS.Reloaded.csproj",
     $PackageName = "Unreal.UE4SS.Reloaded",
     $PublishOutputDir = "Publish/ToUpload",
 
@@ -181,7 +181,7 @@ param (
     $GameBananaItemId = 333681, # From mod page URL.
 
     $NuGetPackageId = "Unreal.UE4SS.Reloaded",
-    $NuGetFeedUrl = "http://packages.sewer56.moe:5000/v3/index.json",
+    $NuGetFeedUrl = "https://packages.sewer56.moe/v3/index.json",
     $NuGetAllowUnlisted = $False,
 
     ## => User: Publish Config
