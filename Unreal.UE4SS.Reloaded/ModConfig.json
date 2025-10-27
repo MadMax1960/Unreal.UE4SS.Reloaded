@@ -1,8 +1,8 @@
 {
   "ModId": "Unreal.UE4SS.Reloaded",
   "ModName": "UE4SS",
-  "ModAuthor": "WistfulHopes, UE4SS Team",
-  "ModVersion": "3.0.1",
+  "ModAuthor": "WistfulHopes, UE4SS Team, A Mudkip",
+  "ModVersion": "4.0.0",
   "ModDescription": "UE4SS as a Reloaded mod",
   "ModDll": "Unreal.UE4SS.Reloaded.dll",
   "ModIcon": "Preview.png",
@@ -10,12 +10,42 @@
   "ModR2RManagedDll64": "x64/Unreal.UE4SS.Reloaded.dll",
   "ModNativeDll32": "",
   "ModNativeDll64": "",
+  "Tags": [],
+  "CanUnload": false,
+  "HasExports": false,
   "IsLibrary": false,
   "ReleaseMetadataFileName": "Unreal.UE4SS.Reloaded.ReleaseMetadata.json",
-  "PluginData": {},
+  "PluginData": {
+    "GitHubDependencies": {
+      "IdToConfigMap": {
+        "reloaded.sharedlib.hooks": {
+          "Config": {
+            "UserName": "Sewer56",
+            "RepositoryName": "Reloaded.SharedLib.Hooks.ReloadedII",
+            "UseReleaseTag": true,
+            "AssetFileName": "reloaded.sharedlib.hooks.zip"
+          },
+          "ReleaseMetadataName": "Sewer56.Update.ReleaseMetadata.json"
+        }
+      }
+    },
+    "GitHubRelease": {
+      "UserName": "MadMax1960",
+      "RepositoryName": "Unreal.UE4SS.Reloaded",
+      "UseReleaseTag": true,
+      "AssetFileName": "Mod.zip"
+    }
+  },
   "IsUniversalMod": true,
-  "ModDependencies": [ "reloaded.sharedlib.hooks" ],
+  "ModDependencies": [
+    "p3rpc.skins.universalskeletonfix",
+    "reloaded.sharedlib.hooks"
+  ],
   "OptionalDependencies": [],
-  "SupportedAppId": [],
-  "ProjectUrl": ""
+  "SupportedAppId": [
+    "p3r.exe"
+  ],
+  "ProjectUrl": "",
+  "CreatorUrl": "",
+  "IsSeparator": false
 }
