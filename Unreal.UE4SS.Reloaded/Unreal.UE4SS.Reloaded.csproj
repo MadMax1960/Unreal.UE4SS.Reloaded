@@ -48,11 +48,12 @@
 		<UE4SSContent Include="Ue4ss\**\*" Exclude="Ue4ss\**\" />
 	</ItemGroup>
 
-	<Target Name="CopyUE4SSContent" AfterTargets="Build">
-		<Copy SourceFiles="@(UE4SSContent)"
-              DestinationFiles="@(UE4SSContent->'$(OutputPath)%(RecursiveDir)%(Filename)%(Extension)')"
-              SkipUnchangedFiles="true" />
-	</Target>
+	<ItemGroup>
+		<Content Include="Ue4ss\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Reloaded.Mod.Interfaces" Version="2.4.0" ExcludeAssets="runtime"/>
