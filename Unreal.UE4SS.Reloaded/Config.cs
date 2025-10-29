@@ -128,19 +128,19 @@ public class Config : Configurable<Config>
     [Category("Debug")]
     [DisplayName("Console Enabled")]
     [Description("Enable the external UE4SS debug console.")]
-    [DefaultValue(true)]
+    [DefaultValue(false)]
     public bool ConsoleEnabled { get; set; } = true;
 
     [Category("Debug")]
     [DisplayName("GUI Console Enabled")]
     [Description("Enable the GUI console overlay.")]
-    [DefaultValue(true)]
+    [DefaultValue(false)]
     public bool GuiConsoleEnabled { get; set; } = true;
 
     [Category("Debug")]
     [DisplayName("GUI Console Visible")]
     [Description("Whether the GUI console is visible by default.")]
-    [DefaultValue(true)]
+    [DefaultValue(false)]
     public bool GuiConsoleVisible { get; set; } = true;
 
     [Category("Debug")]
