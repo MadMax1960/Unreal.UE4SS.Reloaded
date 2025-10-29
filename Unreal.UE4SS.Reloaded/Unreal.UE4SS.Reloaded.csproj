@@ -52,6 +52,7 @@
 		<Content Include="Ue4ss\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<TargetPath>%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
 		</Content>
 	</ItemGroup>
 
