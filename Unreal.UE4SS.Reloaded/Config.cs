@@ -8,7 +8,7 @@ public class Config : Configurable<Config>
     [Category("Logging")]
     [DisplayName("Print UE4SS Log to Console")]
     [Description("When enabled, the contents of UE4SS.log are mirrored to the Reloaded-II console.")]
-    [DefaultValue(true)]
+    [DefaultValue(false)]
     public bool EnableLogPrinter { get; set; } = true;
 
     [Category("Overrides")]
