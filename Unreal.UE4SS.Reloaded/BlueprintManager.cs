@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 using Reloaded.Mod.Interfaces;
 
 namespace UE4SSReloaded;
@@ -21,25 +20,14 @@ internal sealed class BlueprintManager
         var modDirectory = _modLoader.GetDirectoryForModId(_modConfig.ModId);
         _outputPath = Path.Combine(modDirectory, "Mods", "BPModLoaderMod", "Scripts", "config.txt");
     }
-    public void RefreshConfig()
+    public void RefreshConfig(IEnumerable<string> enabledDependencyModDirectories)
     {
         try
         {
-            var modDirectory = _modLoader.GetDirectoryForModId(_modConfig.ModId);
-            var modsRootDirectory = Directory.GetParent(modDirectory)?.FullName;
-            if (string.IsNullOrEmpty(modsRootDirectory) || !Directory.Exists(modsRootDirectory))
-            {
-                _logger.WriteLine($"[{_modConfig.ModId}] Unable to locate mods directory at '{modsRootDirectory}'.");
-                return;
-            }
-
             var blueprintFolders = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var modPath in Directory.EnumerateDirectories(modsRootDirectory))
+            foreach (var modPath in enabledDependencyModDirectories)
             {
-                if (!DependsOnCurrentMod(modPath))
-                    continue;
-
                 var gameBlueprintFolder = GameDirectoryMap.GetBlueprintRootFolderName();
                 var blueprintRoot = Path.Combine(modPath, "UnrealEssentials", gameBlueprintFolder, "Content", "Mods");
                 if (!Directory.Exists(blueprintRoot))
@@ -60,38 +48,5 @@ internal sealed class BlueprintManager
         {
             _logger.WriteLine($"[{_modConfig.ModId}] Failed to refresh BPModLoader config: {ex}");
         }
-    }
-
-    private bool DependsOnCurrentMod(string modDirectory)
-    {
-        var configPath = Path.Combine(modDirectory, "ModConfig.json");
-        if (!File.Exists(configPath))
-            return false;
-
-        try
-        {
-            using var stream = File.OpenRead(configPath);
-            using var document = JsonDocument.Parse(stream);
-
-            if (document.RootElement.TryGetProperty("ModDependencies", out var dependencies) &&
-                dependencies.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var dependency in dependencies.EnumerateArray())
-                {
-                    if (dependency.ValueKind == JsonValueKind.String &&
-                        dependency.GetString() is { } dependencyId &&
-                        dependencyId.Equals(_modConfig.ModId, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.WriteLine($"[{_modConfig.ModId}] Failed to inspect dependencies for '{configPath}': {ex.Message}");
-        }
-
-        return false;
     }
 }
