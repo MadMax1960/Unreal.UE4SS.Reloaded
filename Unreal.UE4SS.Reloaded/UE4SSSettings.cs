@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -20,7 +21,7 @@ internal sealed class UE4SSSettings
         _logger = logger;
     }
 
-    public void Write(Config config)
+    public void Write(Config config, IEnumerable<string>? additionalModFolderPaths = null)
     {
         try
         {
@@ -30,7 +31,7 @@ internal sealed class UE4SSSettings
 
             Directory.CreateDirectory(settingsDirectory);
 
-            var content = BuildSettings(config);
+            var content = BuildSettings(config, additionalModFolderPaths ?? Array.Empty<string>());
             File.WriteAllText(settingsPath, content, Encoding.UTF8);
         }
         catch (Exception ex)
@@ -39,13 +40,17 @@ internal sealed class UE4SSSettings
         }
     }
 
-    private static string BuildSettings(Config config)
+    private static string BuildSettings(Config config, IEnumerable<string> additionalModFolderPaths)
     {
         var sb = new StringBuilder();
         sb.AppendLine("[Overrides]");
         sb.AppendLine("; Path to the 'Mods' folder");
         sb.AppendLine("; Default: <dll_directory>/Mods");
         sb.AppendLine($"ModsFolderPath = {config.ModsFolderPath}");
+        foreach (var folderPath in additionalModFolderPaths)
+        {
+            sb.AppendLine($"+ModsFolderPaths = {folderPath}");
+        }
         sb.AppendLine();
         sb.AppendLine("; Path to a specific mods.txt file to use as the controlling mod list.");
         sb.AppendLine("; If set, ONLY this mods.txt will be parsed instead of mods.txt from all mod directories.");

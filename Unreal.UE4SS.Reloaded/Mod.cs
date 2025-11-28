@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -51,6 +52,13 @@ public partial class Mod : ModBase // <= Do not Remove.
     private readonly BlueprintManager _blueprintManager;
 
     /// <summary>
+    /// Responsible for configuring Lua mod search paths.
+    /// </summary>
+    private readonly LuaLoader _luaLoader;
+
+    private IReadOnlyCollection<string> _luaModFolders = Array.Empty<string>();
+
+    /// <summary>
     /// Mirrors UE4SS log output into the Reloaded-II console.
     /// </summary>
     private readonly LogPrinter _logPrinter;
@@ -75,11 +83,12 @@ public partial class Mod : ModBase // <= Do not Remove.
         GameDirectoryMap.ApplyConfigOverrides(_configuration);
 
         _blueprintManager = new BlueprintManager(_modLoader, _modConfig, _logger);
+        _luaLoader = new LuaLoader(_modLoader, _modConfig, _logger);
 
         var modDirectory = _modLoader.GetDirectoryForModId(context.ModConfig.ModId);
 
         _settings = new UE4SSSettings(_modLoader, _modConfig, _logger);
-        _settings.Write(_configuration);
+        RefreshLuaFoldersAndWriteSettings();
         var ue4ssDllPath = Path.Combine(modDirectory, "UE4SS.dll");
         var dll = NativeLibrary.Load(ue4ssDllPath);
 
@@ -99,6 +108,7 @@ public partial class Mod : ModBase // <= Do not Remove.
             }
 
             _blueprintManager.RefreshConfig();
+            RefreshLuaFoldersAndWriteSettings();
         };
 
         _modLoader.ModUnloading += (v1, configV1) =>
@@ -110,6 +120,7 @@ public partial class Mod : ModBase // <= Do not Remove.
             }
 
             _blueprintManager.RefreshConfig();
+            RefreshLuaFoldersAndWriteSettings();
         };
     }
 
@@ -122,7 +133,7 @@ public partial class Mod : ModBase // <= Do not Remove.
         _logger.WriteLine($"[{_modConfig.ModId}] Config Updated: Applying");
         _logPrinter.SetEnabled(_configuration.EnableLogPrinter);
         GameDirectoryMap.ApplyConfigOverrides(_configuration);
-        _settings.Write(_configuration);
+        RefreshLuaFoldersAndWriteSettings();
     }
     #endregion
 
@@ -131,4 +142,10 @@ public partial class Mod : ModBase // <= Do not Remove.
     public Mod() { }
 #pragma warning restore CS8618
     #endregion
+
+    private void RefreshLuaFoldersAndWriteSettings()
+    {
+        _luaModFolders = _luaLoader.RefreshConfig();
+        _settings.Write(_configuration, _luaModFolders);
+    }
 }
