@@ -17,11 +17,23 @@ public class Config : Configurable<Config>
     [DefaultValue("")]
     public string ModsFolderPath { get; set; } = string.Empty;
 
+    [Category("Overrides")]
+    [DisplayName("Controlling Mods.txt Path Override")]
+    [Description("Path to a specific mods.txt file to use as the controlling mod list. Leave empty to scan all mod directories.")]
+    [DefaultValue("")]
+    public string ControllingModsTxt { get; set; } = string.Empty;
+
     [Category("General")]
     [DisplayName("Enable Hot Reload System")]
     [Description("Whether the hot reload system should be enabled.")]
     [DefaultValue(true)]
     public bool EnableHotReloadSystem { get; set; } = true;
+
+    [Category("General")]
+    [DisplayName("Hot Reload Key")]
+    [Description("The key that will trigger a reload of all mods. CTRL is always required.")]
+    [DefaultValue("R")]
+    public string HotReloadKey { get; set; } = "R";
 
     [Category("General")]
     [DisplayName("Use Cache")]
@@ -46,6 +58,18 @@ public class Config : Configurable<Config>
     [Description("Create UObject listeners in GUObjectArray to create a fast cache instead of iterating GUObjectArray.")]
     [DefaultValue(true)]
     public bool UseUObjectArrayCache { get; set; } = true;
+
+    [Category("General")]
+    [DisplayName("Do Early Scan")]
+    [Description("Perform a single AOB scan as soon as possible after the game starts.")]
+    [DefaultValue(false)]
+    public bool DoEarlyScan { get; set; } = false;
+
+    [Category("General")]
+    [DisplayName("Enable Search By Memory Address")]
+    [Description("When the Live View search query is a hex number, try to find the UObject that contains that memory address.")]
+    [DefaultValue(false)]
+    public bool EnableSearchByMemoryAddress { get; set; } = false;
 
     [Category("Engine Version Override")]
     [DisplayName("Major Version Override")]
@@ -190,8 +214,8 @@ public class Config : Configurable<Config>
     [Category("Memory")]
     [DisplayName("Max Memory Usage During Asset Loading")]
     [Description("Maximum memory usage percentage allowed before asset loading is paused when forced loading is enabled.")]
-    [DefaultValue(85)]
-    public int MaxMemoryUsageDuringAssetLoading { get; set; } = 85;
+    [DefaultValue(80)]
+    public int MaxMemoryUsageDuringAssetLoading { get; set; } = 80;
 
     [Category("Hooks")]
     [DisplayName("Hook ProcessInternal")]
@@ -230,6 +254,12 @@ public class Config : Configurable<Config>
     public bool HookBeginPlay { get; set; } = true;
 
     [Category("Hooks")]
+    [DisplayName("Hook EndPlay")]
+    [Description("Enable the EndPlay hook.")]
+    [DefaultValue(true)]
+    public bool HookEndPlay { get; set; } = true;
+
+    [Category("Hooks")]
     [DisplayName("Hook LocalPlayer Exec")]
     [Description("Enable the LocalPlayer Exec hook.")]
     [DefaultValue(true)]
@@ -252,6 +282,24 @@ public class Config : Configurable<Config>
     [Description("Enable the GameViewportClient Tick hook.")]
     [DefaultValue(true)]
     public bool HookGameViewportClientTick { get; set; } = true;
+
+    [Category("Hooks")]
+    [DisplayName("Hook UObject ProcessEvent")]
+    [Description("Enable the UObject ProcessEvent hook.")]
+    [DefaultValue(true)]
+    public bool HookUObjectProcessEvent { get; set; } = true;
+
+    [Category("Hooks")]
+    [DisplayName("Hook Process Console Exec")]
+    [Description("Enable the ProcessConsoleExec hook.")]
+    [DefaultValue(true)]
+    public bool HookProcessConsoleExec { get; set; } = true;
+
+    [Category("Hooks")]
+    [DisplayName("Hook UStruct Link")]
+    [Description("Enable the UStruct::Link hook.")]
+    [DefaultValue(true)]
+    public bool HookUStructLink { get; set; } = true;
 
     [Category("Hooks")]
     [DisplayName("FExec VTable Offset In LocalPlayer")]
