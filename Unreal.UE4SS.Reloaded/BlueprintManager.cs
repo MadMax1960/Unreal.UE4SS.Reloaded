@@ -40,7 +40,7 @@ internal sealed class BlueprintManager
                 if (!DependsOnCurrentMod(modPath))
                     continue;
 
-                var gameBlueprintFolder = BlueprintGameDirectoryMap.GetBlueprintRootFolderName();
+                var gameBlueprintFolder = GameDirectoryMap.GetBlueprintRootFolderName();
                 var blueprintRoot = Path.Combine(modPath, "UnrealEssentials", gameBlueprintFolder, "Content", "Mods");
                 if (!Directory.Exists(blueprintRoot))
                     continue;

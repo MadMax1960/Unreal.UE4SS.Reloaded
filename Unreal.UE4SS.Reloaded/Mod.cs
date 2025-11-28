@@ -72,6 +72,8 @@ public partial class Mod : ModBase // <= Do not Remove.
         _configuration = context.Configuration;
         _modConfig = context.ModConfig;
 
+        GameDirectoryMap.ApplyConfigOverrides(_configuration);
+
         _blueprintManager = new BlueprintManager(_modLoader, _modConfig, _logger);
 
         var modDirectory = _modLoader.GetDirectoryForModId(context.ModConfig.ModId);
@@ -119,6 +121,7 @@ public partial class Mod : ModBase // <= Do not Remove.
         _configuration = configuration;
         _logger.WriteLine($"[{_modConfig.ModId}] Config Updated: Applying");
         _logPrinter.SetEnabled(_configuration.EnableLogPrinter);
+        GameDirectoryMap.ApplyConfigOverrides(_configuration);
         _settings.Write(_configuration);
     }
     #endregion
