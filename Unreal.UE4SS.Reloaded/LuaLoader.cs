@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 using Reloaded.Mod.Interfaces;
+using Reloaded.Mod.Interfaces.Internal;
 
 namespace UE4SSReloaded;
 
@@ -12,76 +12,63 @@ internal sealed class LuaLoader
     private readonly IModConfig _modConfig;
     private readonly ILogger _logger;
 
-    public LuaLoader(IModLoader modLoader, IModConfig modConfig, ILogger logger)
+    private readonly SortedSet<string> _luaFolders = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _modLuaFolders = new(StringComparer.OrdinalIgnoreCase);
+
+    public LuaLoader(IModLoader modLoader, IModConfig modConfig, ILogger logger, IEnumerable<string> initialLuaFolders)
     {
         _modLoader = modLoader;
         _modConfig = modConfig;
         _logger = logger;
-    }
 
-    public IReadOnlyCollection<string> RefreshConfig()
-    {
-        try
+        foreach (var folder in initialLuaFolders)
         {
-            var modDirectory = _modLoader.GetDirectoryForModId(_modConfig.ModId);
-            var modsRootDirectory = Directory.GetParent(modDirectory)?.FullName;
-            if (string.IsNullOrEmpty(modsRootDirectory) || !Directory.Exists(modsRootDirectory))
-            {
-                _logger.WriteLine($"[{_modConfig.ModId}] Unable to locate mods directory at '{modsRootDirectory}'.");
-                return Array.Empty<string>();
-            }
-
-            var luaFolders = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var modPath in Directory.EnumerateDirectories(modsRootDirectory))
-            {
-                if (!DependsOnCurrentMod(modPath))
-                    continue;
-
-                var luaDirectory = Path.Combine(modPath, "Lua");
-                if (!Directory.Exists(luaDirectory))
-                    continue;
-
-                luaFolders.Add(luaDirectory);
-            }
-
-            return luaFolders;
-        }
-        catch (Exception ex)
-        {
-            _logger.WriteLine($"[{_modConfig.ModId}] Failed to refresh Lua config: {ex}");
-            return Array.Empty<string>();
+            if (!string.IsNullOrWhiteSpace(folder))
+                _luaFolders.Add(folder);
         }
     }
 
-    private bool DependsOnCurrentMod(string modDirectory)
-    {
-        var configPath = Path.Combine(modDirectory, "ModConfig.json");
-        if (!File.Exists(configPath))
-            return false;
+    public IReadOnlyCollection<string> GetLuaFolders()
+        => _luaFolders;
 
+    public void HandleModLoaded(IModConfigV1 modConfig)
+    {
         try
         {
-            using var stream = File.OpenRead(configPath);
-            using var document = JsonDocument.Parse(stream);
+            if (!DependsOnCurrentMod(modConfig))
+                return;
 
-            if (document.RootElement.TryGetProperty("ModDependencies", out var dependencies) &&
-                dependencies.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var dependency in dependencies.EnumerateArray())
-                {
-                    if (dependency.ValueKind == JsonValueKind.String &&
-                        dependency.GetString() is { } dependencyId &&
-                        dependencyId.Equals(_modConfig.ModId, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-            }
+            var modDirectory = _modLoader.GetDirectoryForModId(modConfig.ModId);
+            var luaDirectory = Path.Combine(modDirectory, "Lua");
+
+            if (!Directory.Exists(luaDirectory))
+                return;
+
+            _modLuaFolders[modConfig.ModId] = luaDirectory;
+            _luaFolders.Add(luaDirectory);
         }
         catch (Exception ex)
         {
-            _logger.WriteLine($"[{_modConfig.ModId}] Failed to inspect dependencies for '{configPath}': {ex.Message}");
+            _logger.WriteLine($"[{_modConfig.ModId}] Failed to register Lua folder for '{modConfig.ModId}': {ex}");
+        }
+    }
+
+    public void HandleModUnloaded(IModConfigV1 modConfig)
+    {
+        if (_modLuaFolders.Remove(modConfig.ModId, out var luaDirectory))
+        {
+            _luaFolders.Remove(luaDirectory);
+        }
+    }
+
+    private bool DependsOnCurrentMod(IModConfigV1 modConfig)
+    {
+        var dependencies = modConfig.ModDependencies ?? Array.Empty<string>();
+
+        foreach (var dependency in dependencies)
+        {
+            if (dependency.Equals(_modConfig.ModId, StringComparison.OrdinalIgnoreCase))
+                return true;
         }
 
         return false;

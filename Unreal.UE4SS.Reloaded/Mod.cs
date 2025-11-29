@@ -32,6 +32,11 @@ public partial class Mod : ModBase // <= Do not Remove.
     private readonly ILogger _logger;
 
     /// <summary>
+    /// Path to this mod's directory.
+    /// </summary>
+    private readonly string _modDirectory;
+
+    /// <summary>
     /// Entry point into the mod, instance that created this class.
     /// </summary>
     private readonly IMod _owner;
@@ -61,12 +66,17 @@ public partial class Mod : ModBase // <= Do not Remove.
     /// <summary>
     /// Mirrors UE4SS log output into the Reloaded-II console.
     /// </summary>
-    private readonly LogPrinter _logPrinter;
+    private LogPrinter? _logPrinter;
 
     /// <summary>
     /// Writes UE4SS configuration settings to disk.
     /// </summary>
     private readonly UE4SSSettings _settings;
+
+    /// <summary>
+    /// Handle to the loaded UE4SS library.
+    /// </summary>
+    private nint? _ue4ssDllHandle;
 
     [LibraryImport("UE4SS.dll", EntryPoint = "setup_mod")]
     private static partial void SetupMod([MarshalAs(UnmanagedType.LPWStr)] string str);
@@ -80,23 +90,15 @@ public partial class Mod : ModBase // <= Do not Remove.
         _configuration = context.Configuration;
         _modConfig = context.ModConfig;
 
+        _modDirectory = _modLoader.GetDirectoryForModId(context.ModConfig.ModId);
+
         GameDirectoryMap.ApplyConfigOverrides(_configuration);
 
         _blueprintManager = new BlueprintManager(_modLoader, _modConfig, _logger);
-        _luaLoader = new LuaLoader(_modLoader, _modConfig, _logger);
-
-        var modDirectory = _modLoader.GetDirectoryForModId(context.ModConfig.ModId);
-
+        var additionalLuaFolders = GameDirectoryMap.GetAdditionalLuaModFolders(_modDirectory);
+        _luaLoader = new LuaLoader(_modLoader, _modConfig, _logger, additionalLuaFolders);
         _settings = new UE4SSSettings(_modLoader, _modConfig, _logger);
-        RefreshLuaFoldersAndWriteSettings();
-        var ue4ssDllPath = Path.Combine(modDirectory, "UE4SS.dll");
-        var dll = NativeLibrary.Load(ue4ssDllPath);
-
-        _logPrinter = new LogPrinter(_logger, Path.GetDirectoryName(ue4ssDllPath) ?? modDirectory, _modConfig.ModId);
-        _logPrinter.SetEnabled(_configuration.EnableLogPrinter);
-
-        _blueprintManager.RefreshConfig();
-
+        _blueprintManager.Initialize();
 
         _modLoader.ModLoading += (v1, configV1) =>
         {
@@ -107,21 +109,31 @@ public partial class Mod : ModBase // <= Do not Remove.
                 SetupMod(ue4SsDirectory);
             }
 
-            _blueprintManager.RefreshConfig();
+            _blueprintManager.HandleModLoaded(configV1);
+            _luaLoader.HandleModLoaded(configV1);
             RefreshLuaFoldersAndWriteSettings();
         };
+
+        _modLoader.OnModLoaderInitialized += OnModLoaderInitialized;
 
         _modLoader.ModUnloading += (v1, configV1) =>
         {
             if (configV1.ModId.Equals(_modConfig.ModId, StringComparison.OrdinalIgnoreCase))
             {
-                NativeLibrary.Free(dll);
-                _logPrinter.Dispose();
+                if (_ue4ssDllHandle.HasValue)
+                {
+                    NativeLibrary.Free(_ue4ssDllHandle.Value);
+                }
+
+                _logPrinter?.Dispose();
             }
 
-            _blueprintManager.RefreshConfig();
+            _blueprintManager.HandleModUnloaded(configV1);
+            _luaLoader.HandleModUnloaded(configV1);
             RefreshLuaFoldersAndWriteSettings();
         };
+
+        RefreshLuaFoldersAndWriteSettings();
     }
 
     #region Standard Overrides
@@ -131,7 +143,7 @@ public partial class Mod : ModBase // <= Do not Remove.
         // ... your code here.
         _configuration = configuration;
         _logger.WriteLine($"[{_modConfig.ModId}] Config Updated: Applying");
-        _logPrinter.SetEnabled(_configuration.EnableLogPrinter);
+        _logPrinter?.SetEnabled(_configuration.EnableLogPrinter);
         GameDirectoryMap.ApplyConfigOverrides(_configuration);
         RefreshLuaFoldersAndWriteSettings();
     }
@@ -145,7 +157,25 @@ public partial class Mod : ModBase // <= Do not Remove.
 
     private void RefreshLuaFoldersAndWriteSettings()
     {
-        _luaModFolders = _luaLoader.RefreshConfig();
+        _luaModFolders = _luaLoader.GetLuaFolders();
         _settings.Write(_configuration, _luaModFolders);
+    }
+
+    private void OnModLoaderInitialized()
+    {
+        RefreshLuaFoldersAndWriteSettings();
+        InitializeUe4ss();
+    }
+
+    private void InitializeUe4ss()
+    {
+        if (_ue4ssDllHandle.HasValue)
+            return;
+
+        var ue4ssDllPath = Path.Combine(_modDirectory, "UE4SS.dll");
+        _ue4ssDllHandle = NativeLibrary.Load(ue4ssDllPath);
+
+        _logPrinter = new LogPrinter(_logger, Path.GetDirectoryName(ue4ssDllPath) ?? _modDirectory, _modConfig.ModId);
+        _logPrinter.SetEnabled(_configuration.EnableLogPrinter);
     }
 }
