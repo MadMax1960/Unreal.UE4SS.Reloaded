@@ -1,0 +1,26 @@
+---@meta
+
+---@class ALV_F001_001_UI_C : ALevelScriptActor
+---@field UberGraphFrame FPointerToUberGraphFrame
+---@field __7StartCamera_ExecuteUbergraph_LV_F001_001_UI_RefProperty ACameraActor
+---@field BP_UITownMapCameraActor_4_ExecuteUbergraph_LV_F001_001_UI_RefProperty ABP_UITownMapCameraActor_C
+---@field __0MainCamera_ExecuteUbergraph_LV_F001_001_UI_RefProperty ACameraActor
+---@field __1SchoolCamera_ExecuteUbergraph_LV_F001_001_UI_RefProperty ACameraActor
+---@field __2DormitoryCamera_ExecuteUbergraph_LV_F001_001_UI_RefProperty ACameraActor
+---@field __3PolonianmallCamera_ExecuteUbergraph_LV_F001_001_UI_RefProperty ACameraActor
+---@field __4PortislandCamera_ExecuteUbergraph_LV_F001_001_UI_RefProperty ACameraActor
+---@field __5IwatodayCamera_ExecuteUbergraph_LV_F001_001_UI_RefProperty ACameraActor
+---@field __6NaganakiCamera_ExecuteUbergraph_LV_F001_001_UI_RefProperty ACameraActor
+---@field __1SchoolLocator_ExecuteUbergraph_LV_F001_001_UI_RefProperty AActor
+---@field __2DormitoryLocator_ExecuteUbergraph_LV_F001_001_UI_RefProperty AActor
+---@field __3PolonianmallLocator_ExecuteUbergraph_LV_F001_001_UI_RefProperty AActor
+---@field __4PortislandCameraLocator_ExecuteUbergraph_LV_F001_001_UI_RefProperty AActor
+---@field __5IwatodaiLocator_ExecuteUbergraph_LV_F001_001_UI_RefProperty AActor
+---@field _6NaganakiLocator_ExecuteUbergraph_LV_F001_001_UI_RefProperty AActor
+local ALV_F001_001_UI_C = {}
+
+function ALV_F001_001_UI_C:ReceiveBeginPlay() end
+---@param EntryPoint int32
+function ALV_F001_001_UI_C:ExecuteUbergraph_LV_F001_001_UI(EntryPoint) end
+
+

@@ -1,0 +1,11 @@
+---@meta
+
+---@class FVelocityBlend
+---@field F_3_2154ABAD4BD15DAC904154B63D704219 float
+---@field B_5_0A0855774CB13BB3E4B0A6847E7154F6 float
+---@field L_8_DFEBB8584D28F158D2562CA60EB07B6D float
+---@field R_9_79E6E09B4A52B442B9FE6DB7192CFBEE float
+local FVelocityBlend = {}
+
+
+

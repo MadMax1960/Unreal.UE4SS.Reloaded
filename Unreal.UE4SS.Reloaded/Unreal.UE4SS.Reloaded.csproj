@@ -45,6 +45,14 @@
     </ItemGroup>
 
 	<ItemGroup>
+		<Content Include="Lua Types Library\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<TargetPath>Lua Types Library/%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<UE4SSContent Include="Ue4ss\**\*" Exclude="Ue4ss\**\" />
 	</ItemGroup>
 

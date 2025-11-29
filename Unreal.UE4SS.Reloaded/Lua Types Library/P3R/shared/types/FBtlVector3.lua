@@ -1,0 +1,10 @@
+---@meta
+
+---@class FFBtlVector3
+---@field X_2_61690A0C49AE65EEBEA3F1869ED7C8B0 float
+---@field Y_4_99EA40724D71AB71DA2E298FBE765633 float
+---@field Z_7_3931AEC34F09EC9204600DB26430DD22 float
+local FFBtlVector3 = {}
+
+
+

@@ -1,0 +1,17 @@
+---@meta
+
+---@class FFBtlSkillRequest
+---@field VFX_12_FC0A46E7401CEF15234852853252F8F8 UNiagaraSystem
+---@field WaitTime_5_A0E35DD448B73849EDC8CCA2B84394C5 float
+---@field Transform_8_1ED9777944BC75B064410DBC4720D3E5 FTransform
+---@field AlreadyRequested_11_4D9F0A764DD28D671E1D04ADEBC72398 boolean
+---@field VFXObjectReference_15_48157CDF40E7ADEB0B4561891B4444E6 UNiagaraComponent
+---@field SkillSE_18_36669D1E484E156FE96E83BBD1EE5057 USoundAtomCue
+---@field SoundVolumeRatio_21_CD65BC84445812231A3A56A450F7D248 float
+---@field SKillSEObjectReference_24_3D85F515417C98E6AC8DCCBC337AF731 UAtomComponent
+---@field UseSECameraRangeParam_27_06FBC19747FA6FEA430094BC256513B8 boolean
+---@field SECameraRangeMax_30_B0B76DDD4A1FD7AE9E20E0AFC160F733 float
+local FFBtlSkillRequest = {}
+
+
+

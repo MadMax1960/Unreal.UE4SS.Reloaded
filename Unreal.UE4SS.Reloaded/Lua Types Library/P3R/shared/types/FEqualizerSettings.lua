@@ -1,0 +1,12 @@
+---@meta
+
+---@class FFEqualizerSettings
+---@field BgmID_2_525BC9F0470D5D47A6A92680314C2ED7 int32
+---@field IconType_10_6C609F2D43B71E1C336C41A906F8A438 int32
+---@field SpeedType_5_80B8F65E47E7EAD3C5A862A5DFC6D870 float
+---@field ColorType_7_4BAAF918444F48E2006812B298894CB3 float
+---@field IsTextureEx_12_9D55A4104B78EE0A0113A3875F65C9F6 boolean
+local FFEqualizerSettings = {}
+
+
+
