@@ -156,10 +156,10 @@ internal sealed class UE4SSSettings
         sb.AppendLine("MakeAllConfigsEngineConfig = " + BoolToNumeric(config.MakeAllConfigsEngineConfig));
         sb.AppendLine();
         sb.AppendLine("[Debug]");
-        sb.AppendLine("; Whether to enable the external UE4SS debug console.");
-        sb.AppendLine("ConsoleEnabled = " + BoolToNumeric(config.ConsoleEnabled));
-        sb.AppendLine("GuiConsoleEnabled = " + BoolToNumeric(config.GuiConsoleEnabled));
-        sb.AppendLine("GuiConsoleVisible = " + BoolToNumeric(config.GuiConsoleVisible));
+        sb.AppendLine("; Whether to enable the UE4SS debug console (external and GUI overlay).");
+        sb.AppendLine("ConsoleEnabled = " + BoolToNumeric(config.EnableDebugConsole));
+        sb.AppendLine("GuiConsoleEnabled = " + BoolToNumeric(config.EnableDebugConsole));
+        sb.AppendLine("GuiConsoleVisible = " + BoolToNumeric(config.EnableDebugConsole));
         sb.AppendLine();
         sb.AppendLine("; Multiplier for Font Size within the Debug Gui");
         sb.AppendLine("; Default: 1");

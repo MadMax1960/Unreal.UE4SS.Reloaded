@@ -150,22 +150,10 @@ public class Config : Configurable<Config>
     public bool MakeAllConfigsEngineConfig { get; set; } = true;
 
     [Category("Debug")]
-    [DisplayName("Console Enabled")]
-    [Description("Enable the external UE4SS debug console.")]
+    [DisplayName("Enable Debug Console")]
+    [Description("Enable the UE4SS debug console (external and GUI overlay).")]
     [DefaultValue(false)]
-    public bool ConsoleEnabled { get; set; } = true;
-
-    [Category("Debug")]
-    [DisplayName("GUI Console Enabled")]
-    [Description("Enable the GUI console overlay.")]
-    [DefaultValue(false)]
-    public bool GuiConsoleEnabled { get; set; } = true;
-
-    [Category("Debug")]
-    [DisplayName("GUI Console Visible")]
-    [Description("Whether the GUI console is visible by default.")]
-    [DefaultValue(false)]
-    public bool GuiConsoleVisible { get; set; } = true;
+    public bool EnableDebugConsole { get; set; } = false;
 
     [Category("Debug")]
     [DisplayName("GUI Console Font Scaling")]
